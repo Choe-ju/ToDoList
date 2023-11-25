@@ -10,24 +10,19 @@ import SwiftUI
 struct AddNewList: View {
     
     @StateObject var todoListStore : TodoListStore
-    @Binding var path: NavigationPath
+    @Environment(\.dismiss) private var dismiss
     
     @State private var title: String = ""
     @State private var description: String = ""
     @State private var completed = false
     
-    
     var body: some View {
         
         Form{
-            NavigationStack {
-                Section {
-                    DataInput(title: "Title", userInput: $title)
-                    DataInput(title: "Description", userInput: $description)
-                    
-                }
+            Section {
+                DataInput(title: "Title", userInput: $title)
+                DataInput(title: "Description", userInput: $description)
             }
-           
             .navigationTitle(Text("New todo"))
         }
         Button {
@@ -44,6 +39,7 @@ struct AddNewList: View {
         let newList = TodoList(id: todoListStore.todoList.count+1, title: title, description: description, completed: completed)
         
         todoListStore.todoList.append(newList)
+        dismiss()
     }
 }
 

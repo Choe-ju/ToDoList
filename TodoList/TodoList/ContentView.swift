@@ -14,13 +14,11 @@ struct TodoList : Codable, Identifiable {
     var completed: Bool
 }
 
-var todoListData: [TodoList] = loadJson("sample.json")
-
 // 데이터 저장소 구조체를 추가
 class TodoListStore : ObservableObject {
-    @Published var todoList: [TodoList]
+    @Published var todoList: [TodoList] = []
     
-    init(todoList: [TodoList] = []) {
+    init(todoList: [TodoList]) {
         self.todoList = todoList
     }
 }
@@ -28,36 +26,31 @@ class TodoListStore : ObservableObject {
 
 
 struct ContentView: View {
-    @StateObject var todoListStore = TodoListStore(todoList: todoListData)
-    @State private var stackPath = NavigationPath()
+    @StateObject var todoListStore = TodoListStore(todoList: loadJson("sample.json"))
     
     var body: some View {
         VStack {
             NavigationStack(){
                 List{
-                    ForEach (0..<todoListStore.todoList.count, id: \.self){ i in
-                        ListCell(todoList: $todoListStore.todoList[i])
+                    ForEach(todoListStore.todoList.indices, id: \.self) { index in
+                        ListCell(todoList: $todoListStore.todoList[index])
                     }
-                    .onDelete(perform: { indexSet in
-                        deleteItems(offsets: indexSet)
-                    })
-                    .onMove(perform: { indices, newOffset in
-                        moveItems(from: indices, to: newOffset)
-                    })
+                    .onDelete(perform: { indexSet in deleteItems(offsets: indexSet) })
+                    .onMove(perform: { indices, newOffset in moveItems(from: indices, to: newOffset) })
                 }
                 .navigationDestination(for: String.self) { _ in
-                    AddNewList(todoListStore: self.todoListStore, path: $stackPath)
+                    AddNewList(todoListStore: self.todoListStore)
                 }
-                
                 .navigationTitle("todoList")
                 .toolbar {
-                    ToolbarItem(placement: ToolbarItemPlacement.navigationBarLeading) {
-                        NavigationLink(value: "Add to-do") {
+                    ToolbarItem(placement: ToolbarItemPlacement.topBarLeading) {
+                        NavigationLink {
+                            AddNewList(todoListStore: todoListStore)
+                        } label: {
                             Image(systemName: "plus")
                         }
                     }
-                    
-                    ToolbarItem(placement: ToolbarItemPlacement.navigationBarTrailing) {
+                    ToolbarItem(placement: ToolbarItemPlacement.topBarTrailing) {
                         EditButton()
                     }
                 }
@@ -100,30 +93,14 @@ struct ListCell: View {
                         Button(action: {
                             edit = !edit
                         }) {
-                            Text(edit ? "Modify" : "Complete")
+                            HStack{
+                                Image(systemName: "pencil")
+                                Text(edit ? "Modify" : "Complete")
+                            }
                         }
                         .background(RoundedRectangle(cornerRadius: 14.0, style: .continuous)
                             .fill(edit ? Color(hue: 0.61, saturation: 0.68, brightness: 1.00, opacity: 1.00) : Color.gray ))
                         .buttonStyle(CustomButtonStyle())
-                        // 삭제하기
-                        Button(action: {
-                            showingAlert = true
-                        }) {
-                            Text("Deleat")
-                        }.alert(Text("삭제하기"),
-                                isPresented: $showingAlert,
-                                actions: {
-                            Button("Deleat") {
-                                // 삭제 기능 추가
-                            }
-                                .foregroundColor(Color.red)
-                            Button("Cancel", role: .cancel) { }
-                        }, message: {
-                            Text("삭제하시겠습니까?")
-                        }
-                        )
-                        .buttonStyle(CustomButtonStyle())
-                        .background(RoundedRectangle(cornerRadius: 14.0, style: .continuous).fill(Color(hue: 0.61, saturation: 0.68, brightness: 1.00, opacity: 1.00)))
                     }
                 }
             }, label: {
