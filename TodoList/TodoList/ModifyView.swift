@@ -1,19 +1,16 @@
 //
-//  AddList.swift
+//  ModifyView.swift
 //  TodoList
 //
-//  Created by 최주원 on 11/12/23.
+//  Created by 최주원 on 11/19/23.
 //
 
 import SwiftUI
 
-struct AddNewList: View {
+struct ModifyView: View {
     
-    @Binding var todoListStore : [Todo]
+    @Binding var modifyTodoList : Todo
     @Environment(\.dismiss) private var dismiss
-    
-    @State private var title: String = ""
-    @State private var description: String = ""
     
     @State private var titleEmptyAlert: Bool = false
     @State private var descriptionEmptyAlert: Bool = false
@@ -22,20 +19,19 @@ struct AddNewList: View {
         
         Form{
             Section {
-                TodoInput(titleInput: $title, descriptionInput: $description)
+                TodoInput(titleInput: $modifyTodoList.title, descriptionInput: $modifyTodoList.description)
             }
-            .navigationTitle(Text("New todo"))
         }
         Button {
-            if title == "" {
+            if modifyTodoList.title == "" {
                 titleEmptyAlert = true
-            }else if description == "" {
+            }else if modifyTodoList.description == "" {
                 descriptionEmptyAlert = true
             }else{
-                addNewList()
+                dismiss()
             }
         } label: {
-            Text("Add todo")
+            Text("Complete")
         }
         .font(Font.body.weight(.bold))
         .padding(.vertical, 7)
@@ -53,24 +49,16 @@ struct AddNewList: View {
                isPresented: $descriptionEmptyAlert,
                actions: {
             Button("Skip") {
-                description = "None"
-                addNewList()
+                modifyTodoList.description = "None"
+                dismiss()
             }
             Button("Cancel", role: .none) {}
         }) {
             Text("Would you like to description and skip it?")
         }
-        
-    }
-    func addNewList(){
-        let idNum = todoListStore.last?.id ?? 1
-        let newList = Todo(id: idNum+1, title: title, description: description, completed: false)
-        
-        todoListStore.append(newList)
-        dismiss()
     }
 }
 
 //#Preview {
-//    AddList()
+//    ModifyView()
 //}
