@@ -31,8 +31,8 @@ struct TodoInput: View {
                 
                 TextEditor(text: $descriptionInput)
                     .font(.body)
-                    .frame(minHeight: 300, maxHeight: .infinity)
-                if descriptionInput == "" {
+                    .frame(minHeight: 200, maxHeight: .infinity)
+                if descriptionInput.isEmpty {
                     Text("Enter todo description here")
                         .foregroundStyle(.gray)
                         .font(.body)

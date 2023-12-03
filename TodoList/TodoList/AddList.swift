@@ -6,11 +6,11 @@
 //
 
 import SwiftUI
+import SwiftData
 
 struct AddNewList: View {
-    
-    @Binding var todoListStore : [Todo]
     @Environment(\.dismiss) private var dismiss
+    @Environment(\.modelContext) var context
     
     @State private var title: String = ""
     @State private var description: String = ""
@@ -27,9 +27,9 @@ struct AddNewList: View {
             .navigationTitle(Text("New todo"))
         }
         Button {
-            if title == "" {
+            if title.isEmpty {
                 titleEmptyAlert = true
-            }else if description == "" {
+            }else if description.isEmpty {
                 descriptionEmptyAlert = true
             }else{
                 addNewList()
@@ -41,7 +41,7 @@ struct AddNewList: View {
         .padding(.vertical, 7)
         .foregroundColor(Color.white)
         .frame(maxWidth: .infinity)
-        .background(Color(hue: 0.61, saturation: 0.68, brightness: 1.00, opacity: 1.00))
+        .background(Color(red: 72/255, green: 130/255, blue: 1))
         .alert(Text("No title"),
                isPresented: $titleEmptyAlert,
                actions: {
@@ -53,7 +53,6 @@ struct AddNewList: View {
                isPresented: $descriptionEmptyAlert,
                actions: {
             Button("Skip") {
-                description = "None"
                 addNewList()
             }
             Button("Cancel", role: .none) {}
@@ -63,14 +62,7 @@ struct AddNewList: View {
         
     }
     func addNewList(){
-        let idNum = todoListStore.last?.id ?? 1
-        let newList = Todo(id: idNum+1, title: title, description: description, completed: false)
-        
-        todoListStore.append(newList)
+        context.insert(TodoItem(title: title, detail: description))
         dismiss()
     }
 }
-
-//#Preview {
-//    AddList()
-//}
