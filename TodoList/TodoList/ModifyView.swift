@@ -9,7 +9,7 @@ import SwiftUI
 
 struct ModifyView: View {
     
-    @Binding var modifyTodoList : Todo
+    @Binding var modifyTodoList : TodoItem
     @Environment(\.dismiss) private var dismiss
     
     @State private var titleEmptyAlert: Bool = false
@@ -19,13 +19,13 @@ struct ModifyView: View {
         
         Form{
             Section {
-                TodoInput(titleInput: $modifyTodoList.title, descriptionInput: $modifyTodoList.description)
+                TodoInput(titleInput: $modifyTodoList.title, descriptionInput: $modifyTodoList.detail)
             }
         }
         Button {
-            if modifyTodoList.title == "" {
+            if modifyTodoList.title.isEmpty {
                 titleEmptyAlert = true
-            }else if modifyTodoList.description == "" {
+            }else if modifyTodoList.detail.isEmpty {
                 descriptionEmptyAlert = true
             }else{
                 dismiss()
@@ -37,7 +37,7 @@ struct ModifyView: View {
         .padding(.vertical, 7)
         .foregroundColor(Color.white)
         .frame(maxWidth: .infinity)
-        .background(Color(hue: 0.61, saturation: 0.68, brightness: 1.00, opacity: 1.00))
+        .background(Color(red: 72/255, green: 130/255, blue: 1))
         .alert(Text("No title"),
                isPresented: $titleEmptyAlert,
                actions: {
@@ -49,7 +49,6 @@ struct ModifyView: View {
                isPresented: $descriptionEmptyAlert,
                actions: {
             Button("Skip") {
-                modifyTodoList.description = "None"
                 dismiss()
             }
             Button("Cancel", role: .none) {}
@@ -58,7 +57,3 @@ struct ModifyView: View {
         }
     }
 }
-
-//#Preview {
-//    ModifyView()
-//}
